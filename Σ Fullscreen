@@ -638,7 +638,7 @@ end # Spriteset_Map
 #==============================================================================
 # ■ Scene_Map
 #==============================================================================
- 
+=begin
 class Scene_Map < Scene_Base
  
   #--------------------------------------------------------------------------
@@ -651,7 +651,7 @@ class Scene_Map < Scene_Base
   end
  
 end # Scene_Map
- 
+=end
 #==============================================================================
 # ■ Game_Event
 #==============================================================================
@@ -673,7 +673,7 @@ end # Game_Event
 
 # Chama o método que realiza a mudança de tamanho
 # Graphics.fullscreen
-Graphics.resize_screen(1632, 832)
+Graphics.resize_screen(Configs::SCREEN_WIDTH, Configs::SCREEN_HEIGHT)
 
 __END__
 # TESTES
