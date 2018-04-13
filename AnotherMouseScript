@@ -1,0 +1,1146 @@
+#==============================================================================
+# ** Glitchfinder's Mouse Input Module
+#    Version 3.00
+#------------------------------------------------------------------------------
+#  [RPG Maker XP] [RPG Maker VX] [RPG Maker VX Ace]
+#------------------------------------------------------------------------------
+#  This script helps scripters to use the mouse, without being limited by the
+#  default Input Module.
+#==============================================================================
+# * Version History
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#   Version 1.00 ------------------------------------------------- (2010-03-18)
+#     - Initial version
+#     - Author: Glitchfinder
+#    Version 1.10 ------------------------------------------------ (2010-06-02)
+#      - Methods renamed for efficiency
+#      - Modified to be updated by the Key module instead of the Input module
+#      - Author: Glitchfinder
+#   Version 2.10 ------------------------------------------------- (2011-03-17)
+#     - Added the Mouse.toggle?() method
+#     - Added the Mouse.array_press? method
+#     - Added the Mouse.array_trigger? method
+#     - Added the Mouse.array_repeat? method
+#     - Added the Mouse.array_release? method
+#     - Added the Mouse.array_toggle? method
+#     - Added the Mouse.real_pos() method
+#     - Added the Mouse.relative_pos() method
+#     - Added the Mouse.tile_pos() method
+#     - Added the Mouse.real_x() method
+#     - Added the Mouse.real_y() method
+#     - Added the Mouse.relative_x() method
+#     - Added the Mouse.relative_y() method
+#     - Added the Mouse.tile_x() method
+#     - Added the Mouse.tile_y() method
+#     - Added the Mouse.hide_cursor() method
+#     - Added the Mouse.show_cursor() method
+#     - Added the ANYKEY constant
+#     - Added the ANYBUTTON constant
+#     - Corrected calculations for x() method
+#     - Corrected calculations for y() method
+#     - Author: Glitchfinder
+#   Version 3.00 ------------------------------------------------- (2014-03-02)
+#     - Added the Mouse.double_click?() method
+#     - Added the Mouse.last_click_x() method
+#     - Added the Mouse.last_click_y() method
+#     - Added the Mouse.set_x() method
+#     - Added the Mouse.set_y() method
+#     - Added the Mouse.set_real_x() method
+#     - Added the Mouse.set_real_y() method
+#     - Added the Mouse.set_relative_x() method
+#     - Added the Mouse.set_relative_y() method
+#     - Added the Mouse.set_pos() method
+#     - Added the Mouse.set_real_pos() method
+#     - Added the Mouse.set_relative_pos() method
+#     - Added the Mouse.x_to_real() method
+#     - Added the Mouse.y_to_real() method
+#     - Added the Mouse.x_to_relative() method
+#     - Added the Mouse.y_to_relative() method
+#     - Added the Mouse.real_x_to_x() method
+#     - Added the Mouse.real_y_to_y() method
+#     - Added the Mouse.real_x_to_relative() method
+#     - Added the Mouse.real_y_to_relative() method
+#     - Added the Mouse.relative_x_to_x() method
+#     - Added the Mouse.relative_y_to_y() method
+#     - Added the Mouse.relative_x_to_real() method
+#     - Added the Mouse.relative_y_to_real() method
+#     - Updated the Mouse.dragging?() method
+#     - Updated the Mouse.drag_rect() method
+#     - Updated the Mouse.drag_coor() method
+#     - Fixed the Mouse.hide_cursor() method
+#     - Fixed the Mouse.show_cursor() method
+#     - Fixed the Mouse.in_screen() method
+#     - Fixed the calculations for screen location
+#     - Improved the Mouse.update() method
+#     - Author: Glitchfinder
+#==============================================================================
+# * Instructions
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#  Place this script above Main, and below the default scripts. This script
+#  must also be placed below Glitchfinder's Key Input Module.
+#
+#  This script requires Glitchfinder's Key Input Module. This can be found in
+#  a forum post at viewtopic.php?p=742465
+#
+#  This module is automatically updated by the required Keys module, which
+#  means that the only time you need to call the update method is in a scene
+#  that does not update the default Input module.
+#
+#  This module does not break the functionality of the default Input module.
+#
+#  To use this module, simply use one of the four methods (press?(key),
+#  trigger?(key), repeat?(key), or release?(key)), where key is the index of
+#  the key you want to check. Key may also be used as Mouse::KEYNAME. For a
+#  list of acceptable key names, look below the header.
+#
+#  There is a key named ANYKEY. This can be used like any other key, with the
+#  exception that, instead of corresponding to any one key, it reacts to them
+#  all. If you use it, and any other key would cause the same method to return
+#  true, then the ANYKEY will also return true. This takes into account all
+#  keys on the keyboard, as well.
+#
+#  There is a key named ANYBUTTON. This can be used like any other key, with
+#  the exception that, instead of corresponding to any one key, it reacts to
+#  them all. If you use it, and any other key would cause the same method to
+#  return true, then the ANYBUTTON will also return true. This only takes into
+#  account keys on the mouse.
+#
+#  This script has several additional methods, details of which are in the
+#  method list below.
+#==============================================================================
+# * Method List
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#  Mouse.update
+#    Updates mouse input. Calls to this method are not necessary unless the
+#    default Input module is not being updated.
+#
+#  Mouse.press?(key)
+#    Determines whether the button determined by key is currently being
+#    pressed. If the button is being pressed, returns true. If not, returns
+#    false.
+#
+#  Mouse.trigger?(key)
+#    Determines whether the button determined by key is being pressed again.
+#    "Pressed again" is seen as time having passed between the button being not
+#    pressed and being pressed. If the button is being pressed, returns true.
+#    If not, returns false.
+#
+#  Mouse.repeat?(key)
+#    Determines whether the button determined by key is being pressed again.
+#    Unlike trigger?(), this takes into account the repeat input of a button
+#    being held down continuously. If the button is being pressed, returns
+#    true. If not, returns false.
+#
+#  Mouse.release?(key)
+#    Determines whether the button determined by key has just been released. If
+#    the button has been released, returns true. If not, returns false.
+#
+#  Mouse.toggle?(key)
+#    Determines whether the button determined by key has been toggled. This
+#    functions like Caps Lock, Number Lock, and Scroll Lock, only for all keys.
+#
+#  Mouse.array_press?(keys)
+#    Functions in the same manner as Mouse.press?(), only it takes an array of
+#    keys as input.
+#
+#  Mouse.array_trigger?(keys)
+#    Functions in the same manner as Mouse.trigger?(), only it takes an array
+#    of keys as input.
+#
+#  Mouse.array_repeat?(keys)
+#    Functions in the same manner as Mouse.repeat?(), only it takes an array of
+#    keys as input.
+#
+#  Mouse.array_release?(keys)
+#    Functions in the same manner as Mouse.release?(), only it takes an array
+#    of keys as input.
+#
+#  Mouse.array_toggle?(keys)
+#    Functions in the same manner as Mouse.toggle?(), only it takes an array of
+#    keys as input.
+#
+#  Mouse.in_screen?
+#    This method returns true if the mouse is over the game window, and false if
+#    not. (The function returns false if the mouse is currently over the window
+#    title or edge, instead of the client area)
+#
+#  Mouse.pos
+#    This method returns an array containing the current mouse position, in the
+#    following format: [x, y]
+#
+#  Mouse.real_pos
+#    This method returns an array containing the current mouse position, in the
+#    following format: [x, y] The position returned by this method is the exact
+#    position of the mouse on the monitor.
+#
+#  Mouse.relative_pos
+#    This method returns an array containing the current mouse position, in the
+#    following format: [x, y] The position returned by this method is similar to
+#    the position returned by Mouse.pos, only it will return offscreen
+#    coordinates as well.
+#
+#  Mouse.tile_pos
+#    This method returns an array containing the current mouse position, in the
+#    following format: [x, y] The position returned by this method will be the
+#    position of the map tile the mouse is currently hovering over.
+#
+#  Mouse.x
+#    Returns the current mouse x position. If the mouse is to the left of the
+#    game screen, returns 0. If the mouse is to the right of the game window,
+#    returns the width of the window minus one.
+#
+#  Mouse.y
+#    Returns the current mouse y position. If the mouse is above the game
+#    screen, returns 0. If the mouse is below the game window, returns the
+#    height of the window minus one.
+#
+#  Mouse.real_x
+#    Returns the current x position of the mouse on the monitor.
+#
+#  Mouse.real_y
+#    Returns the current y position of the mouse on the monitor.
+#
+#  Mouse.relative_x
+#    Returns the current mouse x position. If the mouse is to the left of the
+#    game screen, returns negative values. If the mouse is to the right of the
+#    game window, returns values higher than the width of the game window.
+#
+#  Mouse.relative_y
+#    Returns the current mouse y position. If the mouse is above the game
+#    screen, returns negative values. If the mouse is below the game window,
+#    returns values higher than the height of the game window.
+#
+#  Mouse.tile_x
+#    Returns the x position of the map tile the mouse is currently hovering
+#    over. If the mouse is to the left of the game screen, returns 0. If the
+#    mouse is to the right of the game window, returns the x position of the
+#    tiles on the right edge of the screen.
+#
+#  Mouse.tile_y
+#    Returns the y position of the map tile the mouse is currently hovering
+#    over. If the mouse is above the game screen, returns 0. If the mouse is
+#    below the game window, returns the y position of the tiles on the bottom
+#    edge of the screen.
+#
+#  Mouse.dragging?
+#  Mouse.dragging?(button)
+#    Checks to see if the mouse is currently dragging. (The primary button is
+#    being held while the mouse moves across the screen) Returns true if the
+#    mouse is dragging, false if the mouse is not. If an argument is supplied,
+#    this will check the dragging status of the button in question. Otherwise,
+#    the check will supply the status of the primary mouse key.
+#
+#  Mouse.drag_rect
+#  Mouse.drag_rect(button)
+#    Checks to see if the mouse is dragging, and returns the rect of the drag
+#    area. If the mouse is not currently dragging, returns an empty rect. If
+#    the mouse is dragging, returns a screen rect that covers the current drag
+#    area. If an argument is supplied, this will check the dragging status of
+#    the button in question. Otherwise, the check will supply the status of the
+#    primary mouse key.
+#
+#  Mouse.drag_coor
+#  Mouse.drag_coor(button)
+#    Checks to see if the mouse is dragging, and returns the starting
+#    coordinates. If the mouse is not dragging, returns the current mouse
+#    position.  If an argument is supplied, this will check the dragging status
+#    of the button in question. Otherwise, the check will supply the status of
+#    the primary mouse key.The return data is in the following format: [x, y]
+#
+#  Mouse.in_area?(Rect)
+#  Mouse.in_area?(x, y, width, height)
+#    Determines if the mouse is within the specified area. You can input either
+#    a rect or the x, y, width, and height of the area. If the mouse is
+#    currently within that area, returns true. Otherwise, returns false.
+#
+#  Mouse.hide_cursor
+#  Mouse.hide_cursor(reset_state)
+#    Hides the mouse cursor while it is over the game screen. No arguments are
+#    needed. If reset_state is false, the mouse state will not be changed and
+#    it will remain visible. Reset_state is set to true by default.
+#
+#  Mouse.show_cursor
+#  Mouse.show_cursor(reset_state)
+#  Mouse.show_cursor(cursor_name)
+#  Mouse.show_cursor(reset_state, cursor_name)
+#  Mouse.show_cursor(cursor_name, reset_state)
+#    Shows the mouse cursor. No arguments are needed. If reset_state is false,
+#    the mouse state will not be changed and it will remain invisible.
+#    Reset_state is set to true by default. The cursor_name argument is the
+#    location of a bitmap to use as the cursor image. This defaults to
+#    "Graphics/Pictures/GF001-Cursor01" for the file location.
+#
+#  Mouse.double_click?(button)
+#    Returns true if the specified button is pressed twice within a short time.
+#
+#  Mouse.last_click_x(button)
+#  Mouse.last_click_y(button)
+#    Returns the coordinate of the last location at which the supplied mouse
+#    button was pressed.
+#
+#  Mouse.set_x(coordinate)
+#  Mouse.set_y(coordinate)
+#  Mouse.set_real_x(coordinate)
+#  Mouse.set_real_y(coordinate)
+#  Mouse.set_relative_x(coordinate)
+#  Mouse.set_relative_y(coordinate)
+#  Mouse.set_pos(x, y)
+#  Mouse.set_real_pos(x, y)
+#  Mouse.set_relative_pos(x, y)
+#    Sets the mouse location. These functions follow the same coordinate rules
+#    as the equivalent checks listed above.
+#
+#  Mouse.x_to_real(coordinate)
+#  Mouse.y_to_real(coordinate)
+#  Mouse.x_to_relative(coordinate)
+#  Mouse.y_to_relative(coordinate)
+#  Mouse.real_x_to_x(coordinate)
+#  Mouse.real_y_to_y(coordinate)
+#  Mouse.real_x_to_relative(coordinate)
+#  Mouse.real_y_to_relative(coordinate)
+#  Mouse.relative_x_to_x(coordinate)
+#  Mouse.relative_y_to_y(coordinate)
+#  Mouse.relative_x_to_real(coordinate)
+#  Mouse.relative_y_to_real(coordinate)
+#    Converts a coordinate from one system to another. These follow the same
+#    rules as the equivalent functions listed above.
+#==============================================================================
+# *Glitchfinder's Advice
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#  This script is meant for people with a medium or advanced level of scripting
+#  knowledge and ability, or for those using scripts that require this module.
+#==============================================================================
+# * License
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#  This script is licensed under the MIT License:
+#
+#  Copyright (c) 2010-2014 Sean Porter (Glitchfinder) <glitchkey@gmail.com>
+#
+#  Permission is hereby granted, free of charge, to any person obtaining a copy
+#  of this software and associated documentation files (the "Software"), to deal
+#  in the Software without restriction, including without limitation the rights
+#  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#  copies of the Software, and to permit persons to whom the Software is
+#  furnished to do so, subject to the following conditions:
+#
+#  The above copyright notice and this permission notice shall be included in
+#  all copies or substantial portions of the Software.
+#
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#  THE SOFTWARE.
+#==============================================================================
+ 
+#==============================================================================
+# ** Mouse
+#------------------------------------------------------------------------------
+#  This module performs mouse input processing
+#==============================================================================
+ 
+module Mouse
+  #--------------------------------------------------------------------------
+  # * Declare Module Variables
+  #--------------------------------------------------------------------------
+  # Declare API calls
+  @metrics       = Win32API.new('user32', 'GetSystemMetrics', 'i' , 'i')
+  @getCursorPos  = Win32API.new('user32', 'GetCursorPos'    , 'p' , 'v')
+  @getWindowRect = Win32API.new('user32', 'GetWindowRect'   , 'lp', 'v')
+  @showCursor    = Win32API.new('user32', 'ShowCursor'      , 'i' , 'i')
+  @setCursorPos  = Win32API.new('user32', 'SetCursorPos'    , 'ii', 'i')
+  # Get window thread
+  findWindowEx = Win32API.new('user32', 'FindWindowEx', 'llpp', 'i')
+  @window      = findWindowEx.call(0, 0, "RGSS Player", 0)
+  # Set up double click
+  @double_click         = Array.new(7, false)
+  @double_click_counter = Array.new(7, 0)
+  @double_click_frames  = 20
+  @double_click_pixels  = 4
+  # Set up drag
+  @mouse_drag  = Array.new(7) {Array.new([false, 0, 0, 0, 0])}
+  @drag_pixels = 4
+  # Set up last click
+  @last_click_x = Array.new(7, 0)
+  @last_click_y = Array.new(7, 0)
+  # Set mouse to visible
+  @hidden           = false
+  @visible_override = false
+  @cursor           = nil
+  #--------------------------------------------------------------------------
+  # * Mouse Keys
+  #--------------------------------------------------------------------------
+  SWAPBUTTON = @metrics.call(23) == 0 ? false : true # Buttons Swapped
+  LBUTTON    = 0x01 # Physical Left Button
+  RBUTTON    = 0x02 # Physical Right Button
+  MBUTTON    = 0x04 # Middle Mouse Button
+  XBUTTON1   = 0x05 # X1 Mouse Button
+  XBUTTON2   = 0x06 # X2 Mouse Button
+  PRIMARY    = !SWAPBUTTON ? 0x01 : 0x02 # Primary Mouse Button
+  SECONDARY  = !SWAPBUTTON ? 0x02 : 0x01 # Secondary Mouse Button
+  #--------------------------------------------------------------------------
+  # * Special Keys
+  #--------------------------------------------------------------------------
+  ANYKEY     = 0x100 # Any Key
+  ANYBUTTON  = [0x01, 0x02, 0x04, 0x05, 0x06]
+  #--------------------------------------------------------------------------
+  # * Frame Update
+  #--------------------------------------------------------------------------
+  def self.update
+    # create blank rect
+    rect = '0' * 16
+    # Get window rect
+    @getWindowRect.call(@window, rect)
+    # Unpack rect data
+    left, top, right, bottom = rect.unpack("LLLL")
+    # Get window coordinates
+    @window_x = left
+    @window_y = top
+    # Get window dimensions
+    @window_width  = right  - left
+    @window_height = bottom - top
+    # If the game is not fullscreen
+    if @window_width < @metrics.call(16) && @window_height < @metrics.call(17)
+      # Adjust window coordinates
+      @window_x += @metrics.call(5) + @metrics.call(45)
+      @window_y += @metrics.call(6) + @metrics.call(46) + @metrics.call(4)
+      # Adjust window width
+      @window_width  -= (@metrics.call(5) + @metrics.call(45)) * 2
+      # Adjust window height
+      @window_height -= (@metrics.call(6) + @metrics.call(46)) * 2
+      @window_height -= @metrics.call(4)
+    end
+    # Set blank cursor position
+    cursor_position = '0' * 8
+    # Get cursor position
+    @getCursorPos.call(cursor_position)
+    # Unpack cursor position data
+    @real_x, @real_y = cursor_position.unpack('LL')
+    # Set cursor position relative to the window
+    @mouse_x = [[@real_x - @window_x, 0].max, (@window_width  - 1)].min
+    @mouse_y = [[@real_y - @window_y, 0].max, (@window_height - 1)].min
+    # If the cursor is not over the window
+    if (@mouse_x != (@real_x - @window_x) || @mouse_y != (@real_y - @window_y))
+      # Set the mouse to off screen
+      @in_screen = false
+    # If the cursor is over the window
+    else
+      # Set the mouse to on screen
+      @in_screen = true
+    end
+    # Clear double click flags
+    @double_click = Array.new(6, false)
+    # Iterate the mouse buttons
+    for i in ANYBUTTON
+      # Set up mouse deviance
+      x_deviance = (@last_click_x[i] - @mouse_x).abs
+      y_deviance = (@last_click_y[i] - @mouse_y).abs
+      # Correct mouse deviance
+      x_deviance *= -1 if x_deviance < 0
+      y_deviance *= -1 if y_deviance < 0
+      # If the button is triggered
+      if Keys.trigger?(i)
+        # Set allowed deviance
+        deviance = @double_click_pixels
+        # Get the double click counter
+        counter = @double_click_counter[i]
+        # If double click counter is active and deviance is within allowed range
+        if (counter > 0 && x_deviance <= deviance && y_deviance <= deviance)
+          # Set double click flag to true
+          @double_click[i] = true
+        # If double click counter is not running or the cursor is out of bounds
+        else
+          # Reset double click counter
+          @double_click_counter[i] = @double_click_frames
+        end
+        # Set drag start coordinates
+        @mouse_drag[i][1] = @mouse_x
+        @mouse_drag[i][2] = @mouse_y
+        # Set last click coordinates
+        @last_click_x[i]  = @mouse_x
+        @last_click_y[i]  = @mouse_y
+      # If the button is pressed
+      elsif Keys.press?(i)
+        # If the mouse has moved beyond the required deviance
+        if x_deviance >= @drag_pixels && y_deviance >= @drag_pixels
+          # Set the mouse to dragging
+          @mouse_drag[i][0] = true
+        end
+        # If the mouse is dragging
+        if @mouse_drag[i][0] == true
+          # Set current dragging corrdinates
+          @mouse_drag[i][3] = @mouse_x
+          @mouse_drag[i][4] = @mouse_y
+        end
+      # If the button is released
+      else
+        # Reset drag data
+        @mouse_drag[i][0] = false
+        @mouse_drag[i][1] = 0
+        @mouse_drag[i][2] = 0
+        @mouse_drag[i][3] = 0
+        @mouse_drag[i][4] = 0
+      end
+      # If the double click counter is running
+      if @double_click_counter[i] > 0
+        # Cycle the double click counter down one frame
+        @double_click_counter[i] -= 1
+      end
+    end
+    # If the cursor is in the screen and it is set to hidden
+    if @in_screen && @hidden
+      # Hide the mouse cursor
+      hide_cursor(false)
+    # If the cursor is not set to hidden or is not on screen
+    else
+      # Set the mouse to visible
+      show_cursor(false)
+    end
+  end
+  #--------------------------------------------------------------------------
+  # * Get Key Pressed State
+  #     key : key index
+  #--------------------------------------------------------------------------
+  def self.press?(key)
+    # Return key pressed state
+    return Keys.press?(key)
+  end
+  #--------------------------------------------------------------------------
+  # * Get Key Triggered State
+  #     key : key index
+  #--------------------------------------------------------------------------
+  def self.trigger?(key)
+    # Return key triggered state
+    return Keys.trigger?(key)
+  end
+  #--------------------------------------------------------------------------
+  # * Get Key Repeated State
+  #     key : key index
+  #--------------------------------------------------------------------------
+  def self.repeat?(key)
+    # Return key repeated state
+    return Keys.repeat?(key)
+  end
+  #--------------------------------------------------------------------------
+  # * Get Key Released State
+  #     key : key index
+  #--------------------------------------------------------------------------
+  def self.release?(key)
+    # Return key released state
+    return Keys.release?(key)
+  end
+  #--------------------------------------------------------------------------
+  # * Get Key Toggled State
+  #     key : key index
+  #--------------------------------------------------------------------------
+  def self.toggle?(key)
+    # Return key toggled state
+    return Keys.toggle?(key)
+  end
+  #--------------------------------------------------------------------------
+  # * Get Key Pressed State (array)
+  #     keys : array of key indices
+  #--------------------------------------------------------------------------
+  def self.array_press?(keys)
+    # Return key pressed state
+    return Keys.array_press?(keys)
+  end
+  #--------------------------------------------------------------------------
+  # * Get Key Triggered State (array)
+  #     keys : array of key indices
+  #--------------------------------------------------------------------------
+  def self.array_trigger?(keys)
+    # Return key triggered state
+    return Keys.array_trigger?(keys)
+  end
+  #--------------------------------------------------------------------------
+  # * Get Key Repeated State (array)
+  #     keys : array of key indices
+  #--------------------------------------------------------------------------
+  def self.array_repeat?(keys)
+    # Return key repeated state
+    return Keys.array_repeat?(keys)
+  end
+  #--------------------------------------------------------------------------
+  # * Get Key Released State (array)
+  #     keys : array of key indices
+  #--------------------------------------------------------------------------
+  def self.array_release?(keys)
+    # Return key released state
+    return Keys.array_release?(keys)
+  end
+  #--------------------------------------------------------------------------
+  # * Get Key Toggled State (array)
+  #     keys : array of key indices
+  #--------------------------------------------------------------------------
+  def self.array_toggle?(keys)
+    # Return key toggled state
+    return Keys.array_toggle?(keys)
+  end
+  #--------------------------------------------------------------------------
+  # * Is the Mouse on Screen?
+  #--------------------------------------------------------------------------
+  def self.in_screen?
+    # Return mouse in screen flag
+    return @in_screen
+  end
+  #--------------------------------------------------------------------------
+  # * Get Mouse Position
+  #--------------------------------------------------------------------------
+  def self.pos
+    # Return mouse position array
+    return [@mouse_x, @mouse_y]
+  end
+  #--------------------------------------------------------------------------
+  # * Get Real Mouse Position
+  #--------------------------------------------------------------------------
+  def self.real_pos
+    # Return real mouse position array
+    return [@real_x, @real_y]
+  end
+  #--------------------------------------------------------------------------
+  # * Get Relative Mouse Position
+  #--------------------------------------------------------------------------
+  def self.relative_pos
+    # Return relative mouse position array
+    return [relative_x, relative_y]
+  end
+  #--------------------------------------------------------------------------
+  # * Get Mouse Tile Position
+  #--------------------------------------------------------------------------
+  def self.tile_pos
+    # Return mouse tile position array
+    return [tile_x, tile_y]
+  end
+  #--------------------------------------------------------------------------
+  # * Get Mouse X Position
+  #--------------------------------------------------------------------------
+  def self.x
+    # Return mouse x position
+    return @mouse_x
+  end
+  #--------------------------------------------------------------------------
+  # * Get Mouse Y Position
+  #--------------------------------------------------------------------------
+  def self.y
+    # Return mouse y position
+    return @mouse_y
+  end
+  #--------------------------------------------------------------------------
+  # * Get Real Mouse X Position
+  #--------------------------------------------------------------------------
+  def self.real_x
+    # Return real mouse x position
+    return @real_x
+  end
+  #--------------------------------------------------------------------------
+  # * Get Real Mouse Y Position
+  #--------------------------------------------------------------------------
+  def self.real_y
+    # Return real mouse y position
+    return @real_y
+  end
+  #--------------------------------------------------------------------------
+  # * Get Relative Mouse X Position
+  #--------------------------------------------------------------------------
+  def self.relative_x
+    # Return mouse x position
+    return (@real_x - @window_x)
+  end
+  #--------------------------------------------------------------------------
+  # * Get Relative Mouse Y Position
+  #--------------------------------------------------------------------------
+  def self.relative_y
+    # Return mouse y position
+    return (@real_y - @window_y)
+  end
+  #--------------------------------------------------------------------------
+  # * Get Mouse Tile X Position
+  #--------------------------------------------------------------------------
+  def self.tile_x
+    # Return mouse x tile position
+    return (@mouse_x / 32).to_i
+  end
+  #--------------------------------------------------------------------------
+  # * Get Mouse Tile Y Position
+  #--------------------------------------------------------------------------
+  def self.tile_y
+    # Return mouse y tile position
+    return (@mouse_y / 32).to_i
+  end
+  #--------------------------------------------------------------------------
+  # * Get Mouse Dragging Boolean
+  #     args : the mouse button to check
+  #--------------------------------------------------------------------------
+  def self.dragging?(*args)
+    # Get the button
+    if args.is_a?(NilClass) || args[0].is_a?(NilClass)
+      button = PRIMARY
+    else
+      button = args[0]
+    end
+    # Validate button
+    return false if (!(button.to_i.is_a?(Integer)) || button < 1 || button > 6)
+    # Return mouse dragging flag
+    return @mouse_drag[button][0]
+  end
+  #--------------------------------------------------------------------------
+  # * Get Mouse Drag Rect
+  #     args : the mouse button to check
+  #--------------------------------------------------------------------------
+  def self.drag_rect(*args)
+    # Get the button
+    if args.is_a?(NilClass) || args[0].is_a?(NilClass)
+      button = PRIMARY
+    else
+      button = args[0]
+    end
+    # Validate button
+    if (!(button.to_i.is_a?(Integer)) || button < 1 || button > 6)
+      return Rect.new(0, 0, 0, 0)
+    end
+    # Return blank rect if the mouse is not dragging
+    return Rect.new(0, 0, 0, 0) if !@mouse_drag[i][0]
+    # Get drag rect coordinates
+    x = @mouse_drag[i][1]
+    y = @mouse_drag[i][2]
+    # Correct drag rect coordinates
+    x = @mouse_drag[i][3] if x > @mouse_drag[i][3]
+    y = @mouse_drag[i][4] if y > @mouse_drag[i][4]
+    # Get drag rect dimensions
+    width  = @mouse_drag[i][1]
+    height = @mouse_drag[i][2]
+    # Correct drag rect dimensions
+    width  = @mouse_drag[i][3] if x == width
+    height = @mouse_drag[i][4] if y == height
+    width  -= x
+    height -= y
+    # Return drag rect
+    return Rect.new(x, y, width, height)
+  end
+  #--------------------------------------------------------------------------
+  # * Get Mouse Drag Coordinates
+  #     args : the mouse button to check
+  #--------------------------------------------------------------------------
+  def self.drag_coor(*args)
+    # Get the button
+    if args.is_a?(NilClass) || args[0].is_a?(NilClass)
+      button = PRIMARY
+    else
+      button = args[0]
+    end
+    # Validate button
+    if (!(button.to_i.is_a?(Integer)) || button < 1 || button > 6)
+      return [@mouse_x, @mouse_y] if (button < 1 || button > 6)
+    end
+    # Return current coordinates if the mouse isn't dragging
+    return [@mouse_x, @mouse_y] if !@mouse_drag[button][0]
+    # return mouse drag starting coordinates
+    return [@mouse_drag[button][1], @mouse_drag[button][2]]
+  end
+  #--------------------------------------------------------------------------
+  # * Get Mouse in Area Flag
+  #--------------------------------------------------------------------------
+  def self.in_area?(*args)
+    # return false if the mouse is not on screen
+    return false if !@in_screen
+    # If the argument is a rect
+    if args[0].is_a?(Rect)
+      # Return if the mouse is within the rect
+      return (@mouse_x >= args[0].x && @mouse_y >= args[0].y &&
+        @mouse_x < args[0].x + args[0].width &&
+        @mouse_y < args[0].y + args[0].height)
+    # If the arguments are separate
+    else
+      # Return if the mouse is within the specified coordinates
+      return (@mouse_x >= args[0] && @mouse_y >= args[1] &&
+        @mouse_x < args[0] + args[2] && @mouse_y < args[1] + args[3])
+    end
+  end
+  #--------------------------------------------------------------------------
+  # * Hide Cursor
+  #     reset_state : if true, mouse is set to hidden, if false, it is not
+  #--------------------------------------------------------------------------
+  def self.hide_cursor(reset_state = true)
+    # Hide the mouse cursor
+    success = @showCursor.call(0)
+    # If the display counter is less than negative one
+    if success < -1
+      # Loop until the display counter is negative one
+      until success == -1
+        # Increment the mouse display count
+        success = @showCursor.call(1)
+      end
+    # If the display counter is zero or greater
+    elsif success >= 0
+      # Loop until the display counter is netagive one
+      until success == -1
+        # Decrement the mouse display count
+        success = @showCursor.call(0)
+      end
+    end
+    # If set to reset the cursor state
+    if reset_state
+      # Set the mouse to hidden
+      @hidden = true
+      @visible_override = true
+      # hide the cursor if a cursor graphic exists
+      if @cursor.is_a?(Sprite)
+        @cursor.visible = false
+      end
+    end
+  end
+  #--------------------------------------------------------------------------
+  # * Show Cursor
+  #     reset_state : (optional) if false, does not override cursor state
+  #     name        : (optional) the name of a cursor to load
+  #--------------------------------------------------------------------------
+  def self.show_cursor(*args)
+    # Get the reset state for mouse visibility
+    reset_state = true
+    if args[0].is_a?(FalseClass) || args[1].is_a?(FalseClass)
+      reset_state = false
+    end
+    # If set to reset the mouse state
+    if reset_state
+      # Override the cursor visibility
+      @hidden = false
+      # Set the default cursor name
+      cursor_name = "Graphics/Pictures/GF001-Cursor01"
+      # If a cursor name was provided as the first argument
+      if args[0].is_a?(String)
+        cursor_name = args[0]
+      # If a cursor name was provided as the second argument instead
+      elsif args[1].is_a?(String)
+        cursor_name = args[1]
+      end
+      # If the cursor already exists and the bitmap has not been disposed
+      if @cursor.is_a?(Sprite) && !@cursor.bitmap.disposed?
+        # Dispose the bitmap
+        @cursor.bitmap.dispose
+      # If the cursor does not exist
+      elsif !@cursor.is_a?(Sprite)
+        # Create the cursor sprite
+        @cursor = Sprite.new
+      end
+      # Load and set the cursor
+      bitmap = Bitmap.new(cursor_name)
+      @cursor.bitmap = bitmap
+      @cursor.z = 10000
+      @visible_override = true
+    end
+    # If the cursor is set to visible
+    if @visible_override
+      # If the mouse is on screen and there is a cursor
+      if @in_screen && @cursor.is_a?(Sprite)
+        # Hide the Windows cursor
+        hide_cursor(false)
+        # Set the cursor visibility and coordinates
+        @cursor.visible = true
+        @cursor.x = @mouse_x
+        @cursor.y = @mouse_y
+      # Hide the cursor if one exists and if the mouse is off screen
+      elsif @cursor.is_a?(Sprite)
+        @cursor.visible = false
+      end
+      # If the cursor is off screen
+      if !@in_screen
+        # Show the mouse cursor
+        success = @showCursor.call(1)
+        # If the display counter is less than negative one
+        if success < 15
+          # Loop until the display counter is negative one
+          until success == 15
+            # Increment the mouse display count
+            success = @showCursor.call(1)
+          end
+        # If the display counter is zero or greater
+        elsif success > 15
+          # Loop until the display counter is netagive one
+          until success == 15
+            # Decrement the mouse display count
+            success = @showCursor.call(0)
+          end
+        end
+      end
+    end
+  end
+  #--------------------------------------------------------------------------
+  # * Set Mouse X
+  #     coord : the x coordinate to move the mouse to
+  #--------------------------------------------------------------------------
+  def self.set_x(coord)
+    # Validate the argument
+    return false if (coord.is_a?(NilClass)) || !(coord.to_i.is_a?(Integer))
+    # Set the coordinate
+    return self.set_relative_x([[coord.to_i, 0].max, @window_width - 1].min)
+  end
+  #--------------------------------------------------------------------------
+  # * Set Mouse Y
+  #     coord : the y coordinate to move the mouse to
+  #--------------------------------------------------------------------------
+  def self.set_y(coord)
+    # Validate the argument
+    return false if (coord.is_a?(NilClass)) || !(coord.to_i.is_a?(Integer))
+    # Set the coordinate
+    return self.set_relative_y([[coord.to_i, 0].max, @window_height - 1].min)
+  end
+  #--------------------------------------------------------------------------
+  # * Set Real Mouse X
+  #     coord : the x coordinate to move the mouse to
+  #--------------------------------------------------------------------------
+  def self.set_real_x(coord)
+    # Validate the argument
+    return false if (coord.is_a?(NilClass)) || !(coord.to_i.is_a?(Integer))
+    # Set the coordinate
+    return false if(@setCursorPos.call(coord.to_i, @real_y) == 0)
+    # Modify internal coordinates
+    @real_x = coord.to_i
+    @mouse_x = [[coord.to_i - @window_x, 0].max, (@window_width - 1)].min
+    return true
+  end
+  #--------------------------------------------------------------------------
+  # * Set Real Mouse Y
+  #     coord : the y coordinate to move the mouse to
+  #--------------------------------------------------------------------------
+  def self.set_real_y(coord)
+    # Validate the argument
+    return false if (coord.is_a?(NilClass)) || !(coord.to_i.is_a?(Integer))
+    # Set the coordinate
+    return false if(@setCursorPos.call(@real_x, coord.to_i) == 0)
+    # Modify internal coordinates
+    @real_y = coord.to_i
+    @mouse_y = [[coord.to_i - @window_y, 0].max, (@window_height - 1)].min
+    return true
+  end
+  #--------------------------------------------------------------------------
+  # * Set Relative Mouse X
+  #     coord : the x coordinate to move the mouse to
+  #--------------------------------------------------------------------------
+  def self.set_relative_x(coord)
+    # Validate the argument
+    return false if (coord.is_a?(NilClass)) || !(coord.to_i.is_a?(Integer))
+    # Set the coordinate
+    return self.set_real_x([coord.to_i + @window_x, 0].max)
+  end
+  #--------------------------------------------------------------------------
+  # * Set Relative Mouse Y
+  #     coord : the y coordinate to move the mouse to
+  #--------------------------------------------------------------------------
+  def self.set_relative_y(coord)
+    # Validate the argument
+    return false if (coord.is_a?(NilClass)) || !(coord.to_i.is_a?(Integer))
+    # Set the coordinate
+    return self.set_real_y([coord.to_i + @window_y, 0].max)
+  end
+  #--------------------------------------------------------------------------
+  # * Set Mouse Position
+  #     x : the x coordinate to move the mouse to
+  #     y : the y coordinate to move the mouse to
+  #--------------------------------------------------------------------------
+  def self.set_pos(x, y)
+    # Validate the arguments
+    return false if (x.is_a?(NilClass)) || !(x.to_i.is_a?(Integer))
+    return false if (y.is_a?(NilClass)) || !(y.to_i.is_a?(Integer))
+    # Correct the coordinates
+    x = [[x.to_i, 0].max, @window_width  - 1].min
+    y = [[y.to_i, 0].max, @window_height - 1].min
+    # Set the coordinate
+    return self.set_relative_pos(x, y)
+  end
+  #--------------------------------------------------------------------------
+  # * Set Real Mouse Position
+  #     x : the x coordinate to move the mouse to
+  #     y : the y coordinate to move the mouse to
+  #--------------------------------------------------------------------------
+  def self.set_real_pos(x, y)
+    # Validate the arguments
+    return false if (x.is_a?(NilClass)) || !(x.to_i.is_a?(Integer))
+    return false if (y.is_a?(NilClass)) || !(y.to_i.is_a?(Integer))
+    # Set the coordinate
+    return false if (@setCursorPos.call(x.to_i, y.to_i) == 0)
+    # Update internal coordinates
+    @real_x = x.to_i
+    @real_y = y.to_i
+    @mouse_x = [[x.to_i - @window_x, 0].max, (@window_width  - 1)].min
+    @mouse_y = [[y.to_i - @window_y, 0].max, (@window_height - 1)].min
+  end
+  #--------------------------------------------------------------------------
+  # * Set Relative Mouse Position
+  #     x : the x coordinate to move the mouse to
+  #     y : the y coordinate to move the mouse to
+  #--------------------------------------------------------------------------
+  def self.set_relative_pos(x, y)
+    # Validate the arguments
+    return false if (x.is_a?(NilClass)) || !(x.to_i.is_a?(Integer))
+    return false if (y.is_a?(NilClass)) || !(y.to_i.is_a?(Integer))
+    # Correct the coordinates
+    x = [x.to_i + @window_x, 0].max
+    y = [y.to_i + @window_y, 0].max
+    # Set the coordinate
+    return self.set_real_pos(x, y)
+  end
+  #--------------------------------------------------------------------------
+  # * Get Button Double-Click State
+  #     button : the button to check
+  #--------------------------------------------------------------------------
+  def self.double_click?(button)
+    # Validate button
+    return false if (button < 1 || button > 6)
+    # Return the double click state
+    return @double_click[button]
+  end
+  #--------------------------------------------------------------------------
+  # * Get Last Click X
+  #     button : the button to check
+  #--------------------------------------------------------------------------
+  def self.last_click_x(button)
+    # Validate button
+    return false if (button < 1 || button > 6)
+    # Return the double click state
+    return @last_click_x[button]
+  end
+  #--------------------------------------------------------------------------
+  # * Get Last Click Y
+  #     button : the button to check
+  #--------------------------------------------------------------------------
+  def self.last_click_y(button)
+    # Validate button
+    return false if (button < 1 || button > 6)
+    # Return the double click state
+    return @last_click_y[button]
+  end
+  #--------------------------------------------------------------------------
+  # * Convert X Coordinate to Real X Coordinate
+  #     coord : the coordinate to convert
+  #--------------------------------------------------------------------------
+  def self.x_to_real(coord)
+    # Correct coordinate and return
+    return [[coord, 0].max, @window_width - 1].min + @window_x
+  end
+  #--------------------------------------------------------------------------
+  # * Convert Y Coordinate to Real Y Coordinate
+  #     coord : the coordinate to convert
+  #--------------------------------------------------------------------------
+  def self.y_to_real(coord)
+    # Correct coordinate and return
+    return [[coord, 0].max, @window_height - 1].min + @window_y
+  end
+  #--------------------------------------------------------------------------
+  # * Convert X Coordinate to Relative X Coordinate
+  #     coord : the coordinate to convert
+  #--------------------------------------------------------------------------
+  def self.x_to_relative(coord)
+    # Correct coordinate and return
+    return [[coord, 0].max, @window_width - 1].min
+  end
+  #--------------------------------------------------------------------------
+  # * Convert Y Coordinate to Relative Y Coordinate
+  #     coord : the coordinate to convert
+  #--------------------------------------------------------------------------
+  def self.y_to_relative(coord)
+    # Correct coordinate and return
+    return [[coord, 0].max, @window_height - 1].min
+  end
+  #--------------------------------------------------------------------------
+  # * Convert Real X Coordinate to X Coordinate
+  #     coord : the coordinate to convert
+  #--------------------------------------------------------------------------
+  def self.real_x_to_x(coord)
+    # Correct coordinate and return
+    return [[coord - @window_x, 0].max, @window_width - 1].min
+  end
+  #--------------------------------------------------------------------------
+  # * Convert Real Y Coordinate to Y Coordinate
+  #     coord : the coordinate to convert
+  #--------------------------------------------------------------------------
+  def self.real_y_to_y(coord)
+    # Correct coordinate and return
+    return [[coord - @window_y, 0].max, @window_height - 1].min
+  end
+  #--------------------------------------------------------------------------
+  # * Convert Real X Coordinate to Relative X Coordinate
+  #     coord : the coordinate to convert
+  #--------------------------------------------------------------------------
+  def self.real_x_to_relative(coord)
+    # Correct coordinate and return
+    return coord - @window_x
+  end
+  #--------------------------------------------------------------------------
+  # * Convert Real Y Coordinate to Relative Y Coordinate
+  #     coord : the coordinate to convert
+  #--------------------------------------------------------------------------
+  def self.real_y_to_relative(coord)
+    # Correct coordinate and return
+    return coord - @window_y
+  end
+  #--------------------------------------------------------------------------
+  # * Convert Relative X Coordinate to X Coordinate
+  #     coord : the coordinate to convert
+  #--------------------------------------------------------------------------
+  def self.relative_x_to_x(coord)
+    # Correct coordinate and return
+    return [[coord, 0].max, @window_width - 1].min
+  end
+  #--------------------------------------------------------------------------
+  # * Convert Relative Y Coordinate to Y Coordinate
+  #     coord : the coordinate to convert
+  #--------------------------------------------------------------------------
+  def self.relative_y_to_y(coord)
+    # Correct coordinate and return
+    return [[coord, 0].max, @window_height - 1].min
+  end
+  #--------------------------------------------------------------------------
+  # * Convert Relative X Coordinate to Real X Coordinate
+  #     coord : the coordinate to convert
+  #--------------------------------------------------------------------------
+  def self.relative_x_to_real(coord)
+    # Correct coordinate and return
+    return [[coord, 0].max, @window_width - 1].min + @window_x
+  end
+  #--------------------------------------------------------------------------
+  # * Convert Relative Y Coordinate to Real Y Coordinate
+  #     coord : the coordinate to convert
+  #--------------------------------------------------------------------------
+  def self.relative_y_to_real(coord)
+    # Correct coordinate and return
+    return [[coord, 0].max, @window_height - 1].min + @window_y
+  end
+  #--------------------------------------------------------------------------
+  # * Initialize Module
+  #--------------------------------------------------------------------------
+  begin
+    self.update
+  end
+end
+ 
+#==============================================================================
+# ** Keys
+#------------------------------------------------------------------------------
+#  This module performs key input processing
+#==============================================================================
+ 
+module Keys
+  # Add class data
+  class << self
+    #------------------------------------------------------------------------
+    # * Alias Methods
+    #------------------------------------------------------------------------
+    # If the update method has not been aliased
+    unless method_defined?(:mouseinputmodule_keys_update)
+      # Alias the update method
+      alias mouseinputmodule_keys_update update
+    end
+    #------------------------------------------------------------------------
+    # * Frame Update
+    #------------------------------------------------------------------------
+    def update
+      # Call original method
+      mouseinputmodule_keys_update
+      # Update Keys module
+      Mouse.update
+    end
+  end
+end
